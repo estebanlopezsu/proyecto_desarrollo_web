@@ -1,29 +1,63 @@
-// Importa el servicio de usuarios, que se encargará de la lógica para manejar datos de usuarios.
+// Importar servicio de usuarios
 const userService = require('../services/user.service');
 
-// Esta función se encargará de crear un nuevo usuario.
-exports.createUser = async (req, res) => { // Corrección: "rep" debe ser "req" para representar correctamente la solicitud.
-    try {
-        // Extraemos los datos necesarios para crear el usuario desde el cuerpo de la solicitud.
-        const { nombre, email, password, rol_id, administrador_id } = req.body;
-        
-        // Creamos un nuevo usuario utilizando el servicio correspondiente.
+// Controlador para crear nuevos usuarios
+exports.createUser = async (req, res) => {
+    try { 
+        const { nombre, email, password, rol_id, administrador_id } = req.body; // Se extrae los datos de la solicitud para el nuevo usuario
         const newUser = await userService.createUser(nombre, email, password, rol_id, administrador_id);
-        
-        // Respondemos con un mensaje de éxito y el nuevo usuario creado.
-        res.status(201).json({ message: 'Usuario creado con éxito', user: newUser }); // Cambié 281 por 201 (el código estándar para creación exitosa).
+        res.status(201).json({ message: 'Usuario creado con éxito', user: newUser }); // 281 para la creacion de nuevos ususarios
     } catch (err) {
-        // Si algo sale mal, respondemos con un error interno del servidor.
         res.status(500).json({ message: err.message });
     }
 };
 
-// Esta función es para actualizar los datos de un usuario existente.
-exports.updateUser = async (req, res) => { // Corrección: "rep" debe ser "req" para representar la solicitud.
-    // Extraemos el ID del usuario desde los parámetros de la solicitud.
+// Controlador para obtener todos los usuarios asociados a un administrador 
+// req que contiene los datos de la solicitud  y res que se utiliza para enviar las solicitudes
+exports.getAllUsersByAdministradorId = async (req, res) => {
+    try {
+        const admin_from_token = req.user.id; // Se extrae el id del administrador del token de autenticación
+        const { email } = req.query; // Se extrae el email de la consulta para utilizarlo como tipo filtro y es opcional
+        const users = await userService.getAllUsersByAdministradorId(admin_from_token, email);
+        res.status(200).json({message: 'Usuarios consultados con éxito', users });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los usuarios', error });
+    }
+};
+
+//  Controlador para obtener a los usuarios asociados a un rol
+exports.getAllUsersByRolId = async (req, res) => {
+    try {
+        const users = await userService.getAllUsersByRolId(req.params.id);
+        res.status(200).json({ message: 'Usuarios consultados con éxito', users });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los usuarios', error });
+    }
+};
+
+// Controlador para actualizar un usuario
+exports.updateUser = async (req, res) => {
+    const { id } = req.params; // extrae el id de la URL enviado como parametro
+    const { nombre, email, rol_id, administrador_id } = req.body; // se extrae los datos actualizados 
+    const admin_from_token = req.user.id;
+    try {
+        const user = await userService.updateUser(id, nombre, email, rol_id, administrador_id, admin_from_token);
+        res.status(200).json({ message: 'El susuario a actualizado con éxito', user });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Controlador para eliminar un usuario
+exports.deleteUser = async (req, res) => {
     const { id } = req.params;
-    
-    // Aún no se ha implementado la lógica para esta función. Podrías añadirla aquí.
+    const admin_from_token = req.user.id;
+    try {
+        const result = await userService.deleteUser(id, admin_from_token);
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 };
 
 

@@ -5,7 +5,7 @@ const authService = require('../services/auth.service');
 // Iniciar sesión
 
 // Esta función se usará para manejar el inicio de sesión de los usuarios.
-exports.logion = async (req, res) => {
+exports.login = async (req, res) => {
     // Tomamos el correo y la contraseña que el usuario envió en su solicitud.
     const { email, password } = req.body;
     try {

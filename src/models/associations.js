@@ -1,17 +1,15 @@
-// Importamos los modelos de usuario, proyecto y la relación entre ambos.
+// Importamos los modelos de usuario, proyecto y el de usarios-proyectos
 const User = require('./user.model');
-const Proyect = require('./proyect.model');
-const UserProyect = require('./userproyect.model');
+const Project = require('./project.model');
+const UserProject = require('./userProject.model');
 
-// Relaciones muchos a muchos "belongsToMany"
+// Definimos las relaciones 
+// Relaciones muchos a muchos "belongsToMany", entre usuarios y proyectos
+User.belongsToMany(Project, { through: UserProject, foreignkey: 'usuario_id', as: 'proyectos'});
+Project.belongsToMany(User, { through: UserProject, foreignkey: 'proyecto_id', as: 'usuarios'});
 
-// Relacionamos los usuarios con los proyectos mediante una tabla intermedia (UserProyect).
-User.belongsToMany(Proyect, { through: UserProyect, foreignKey: 'usuario_id', as: 'proyectos' }); // Corrección: "foreingkey" -> "foreignKey".
-Proyect.belongsToMany(User, { through: UserProyect, foreignKey: 'proyecto_id', as: 'usuarios' }); // Corrección: "foreingkey" -> "foreignKey".
+// Relación de un proyecto con su administrador "belongsTo"
+Project.belongsTo(User, { foreignkey: 'administrador_id', as: 'administrador'});
 
-// Relación de administrador 
-// Vinculamos un proyecto con un administrador (usuario), pero aquí hay un problema técnico: "belongsToMany" no sería la relación adecuada para esto.
-Proyect.belongsToMany(User, { foreignKey: 'administrador_id', as: 'administrador' }); // Corrección: "foreingkey" -> "foreignKey".
-
-// Exportamos los modelos para que puedan ser utilizados en otras partes del proyecto.
-module.exports = { User, Proyect, UserProyect }; // Corrección: "-" se cambió por "=".
+// Se exporta el modelo con sus relaciones definidas
+module.exports = { User, Project, UserProject };

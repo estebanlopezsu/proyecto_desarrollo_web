@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 // Definimos el modelo "UserProyect" que representa la tabla intermedia "usuarios_proyectos" en la base de datos.
-const UserProyect = sequelize.define('usuarios_proyectos', {
+const UserProject = sequelize.define('usuarios_proyectos', {
     // Campo "id": aunque no es clave primaria aquí, se incrementará automáticamente.
     id: { 
         type: DataTypes.INTEGER, 
