@@ -1,10 +1,16 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 
-exports.createUser = async (nombre, password, rol_id, administrador_id) => {
+exports.createUser = async (nombre, email, password, rol_id, administrador_id) => {
     try {
-        const userExists = await User.findOne({ where: (email)});
-        if (!userExists) {
+        //const userExists = await User.findOne({ where: (email)});
+        const userExists = await User.findOne({
+            where: {
+              email: email // Sintaxis con objeto
+            }
+          });
+        console.log(userExists)
+        if (userExists != null) {
             throw new Error ('El usuario ya existe')
         }
 
@@ -14,24 +20,25 @@ exports.createUser = async (nombre, password, rol_id, administrador_id) => {
             nombre,
             email,
             password: hashedPassword,
-            rol_id,
-            administrador_id
+            rol_id
         });
 
         return newUser;
     } catch (err) {
+        console.log(err)
         throw new Error('Error al crear el usuario: ${err.message}');
     }
 };
 
 // Se exporta el servicio para obtener todos los usuarios de un administrador
-exports.getAllUsersByAdministradorId = async (administrador_id, email) => {
+exports.getAllUsersByAdministradorId = async (id, email) => {
     try {
          // whereClause para filtrar los usuarios
-        const whereClause = { administrador_id };
+        const whereClause = { id };
         if (email) {
             whereClause.email = email;
         }
+        console.log(whereClause)
         //buscams los usuarios que cumplan con el whereClause
         const users = await User.findAll({ where: whereClause, attributes: { exclude: ['password']}});
         return users;
@@ -51,12 +58,13 @@ exports.getAllUsersByRolId = async (rol_id) => {
 };
 
 // Se exporta el servicio para actualizar usuarios
-exports.updateUser = async (id, nombre, email, rol_id, administrador_id, admin_from_token) => {
+exports.updateUser = async (id, nombre, email, rol_id) => {
     try {
+        console.log(id)
         const user = await User.findByPk(id); // va a hacer la busqueda por id || await para que complete la operacion antes de continuar
-        if (user.administrador_id !== admin_from_token) {
-            throw new Error('Acceso denegado, este usuario no esta bajo su administración');
-        }
+        // if (user.administrador_id !== admin_from_token) {
+        //     throw new Error('Acceso denegado, este usuario no esta bajo su administración');
+        // }
 
         if (!user) {
             throw new Error('Usuario no encontrado');
@@ -71,8 +79,7 @@ exports.updateUser = async (id, nombre, email, rol_id, administrador_id, admin_f
         await user.update({
             nombre,
             email,
-            rol_id,
-            administrador_id
+            rol_id
         });
 
         return user;
@@ -85,9 +92,7 @@ exports.updateUser = async (id, nombre, email, rol_id, administrador_id, admin_f
 exports.deleteUser = async (id, admin_from_token) => {
     try {
         const user = await User.findByPk(id);
-        if (user.administrador_id !== admin_from_token) { //primero verifica que si pueda eliminarlo
-            throw new Error('Acceso denegado, este ususario no esta bajo su administración');
-        }
+
 
         //Verifica que el usuario exista
         if (!user) {

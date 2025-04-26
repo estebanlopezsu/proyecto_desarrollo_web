@@ -10,9 +10,12 @@ const authenticateToken = (req, res, next) => {
     if (!token) {
         return res.status(401).json({ message: 'Acceso denegado, no se proporcionó un token'});
     }
-
+console.log(token)
+console.log("separados")
+console.log(SECRET_KEY)
     jwt.verify(token, SECRET_KEY, (err, user) => {
         if (err) {
+            console.log(err.message)
             return res.status(403).json({ message: 'Token no valido' });
         }
         req.user = user;

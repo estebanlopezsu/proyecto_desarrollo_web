@@ -12,7 +12,7 @@ const { authenticateToken, checkRole } = require('../middlewares/auth.middleware
 const ROLES = require('../utils/constants');
 // Ruta POST para manejar el inicio de sesión (login).
 // Aquí se envía información como el email y la contraseña para autenticarse.
-router.post('/auth/login', authenticateToken, checkRole([ROLES.ADMIN]), authController.login);
+router.post('/auth/login', authController.login);
 
 // Exportamos el enrutador para que pueda ser usado en otras partes de la aplicación.
 module.exports = router;

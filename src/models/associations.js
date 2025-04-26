@@ -13,3 +13,4 @@ Project.belongsTo(User, { foreignkey: 'administrador_id', as: 'administrador'});
 
 // Se exporta el modelo con sus relaciones definidas
 module.exports = { User, Project, UserProject };
+

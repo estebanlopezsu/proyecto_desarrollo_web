@@ -5,6 +5,7 @@ const userService = require('../services/user.service');
 exports.createUser = async (req, res) => {
     try { 
         const { nombre, email, password, rol_id, administrador_id } = req.body; // Se extrae los datos de la solicitud para el nuevo usuario
+        console.log(req.body)
         const newUser = await userService.createUser(nombre, email, password, rol_id, administrador_id);
         res.status(201).json({ message: 'Usuario creado con éxito', user: newUser }); // 281 para la creacion de nuevos ususarios
     } catch (err) {
@@ -18,6 +19,8 @@ exports.getAllUsersByAdministradorId = async (req, res) => {
     try {
         const admin_from_token = req.user.id; // Se extrae el id del administrador del token de autenticación
         const { email } = req.query; // Se extrae el email de la consulta para utilizarlo como tipo filtro y es opcional
+        console.log(req.user.id)
+        console.log(email)
         const users = await userService.getAllUsersByAdministradorId(admin_from_token, email);
         res.status(200).json({message: 'Usuarios consultados con éxito', users });
     } catch (error) {
@@ -38,10 +41,10 @@ exports.getAllUsersByRolId = async (req, res) => {
 // Controlador para actualizar un usuario
 exports.updateUser = async (req, res) => {
     const { id } = req.params; // extrae el id de la URL enviado como parametro
-    const { nombre, email, rol_id, administrador_id } = req.body; // se extrae los datos actualizados 
-    const admin_from_token = req.user.id;
+    console.log(req.params)
+    const { nombre, email, rol_id } = req.body; // se extrae los datos actualizados 
     try {
-        const user = await userService.updateUser(id, nombre, email, rol_id, administrador_id, admin_from_token);
+        const user = await userService.updateUser(id, nombre, email, rol_id);
         res.status(200).json({ message: 'El susuario a actualizado con éxito', user });
     } catch (err) {
         res.status(500).json({ message: err.message });
